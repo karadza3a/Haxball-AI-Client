@@ -12,21 +12,30 @@
 #include "PracticalSocket.h"
 #include <iostream>
 #include <cstdlib>
+#include <set>
 
 #define BUFFSIZE 10000
+#define HOME 0
+#define AWAY 1
+
+class GlobalState;
 
 class Communicator {
   string serverHostname;
+  string username;
   short serverBroadcastPort, serverListenPort;
   char receivedMessage[BUFFSIZE];
+
   void sendRaw(const char *message);
+  char *receiveRaw();
+
+  friend GlobalState;
 
 public:
-  char *receiveRaw();
-  void sendLogin(const char *username);
-  void sendCommand(const char *username, int keys);
+  void sendLogin();
+  void sendCommand(int keys);
   Communicator(string serverHostname, short serverBroadcastPort,
-               short serverListenPort);
+               short serverListenPort, string username);
 };
 
 #endif /* Communicator_hpp */

@@ -6,20 +6,24 @@
 //  Copyright © 2015 Andrej Karadzic. All rights reserved.
 //
 
+#include "GlobalState.hpp"
 #include "Communicator.hpp"
 
 int main(int argc, char *argv[]) {
 
-  Communicator *comm = new Communicator("localhost", 16000, 15000);
-  comm->sendLogin("Bot");
+  string username = "Bot";
 
-  sleep(2);
+  Communicator *comm = new Communicator("localhost", 16000, 15000, username);
 
-  comm->sendCommand("Bot", 2);
+  comm->sendLogin();
 
-  sleep(2);
+  GlobalState GS(comm);
 
-  cout << comm->receiveRaw() << endl;
+  for (int i = 0; i < 1000000; i++) {
+    GS.updateState();
+
+    comm->sendCommand(8);
+  }
 
   return 0;
 }

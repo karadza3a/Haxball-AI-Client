@@ -7,23 +7,24 @@
 //
 
 #include "Communicator.hpp"
+#include <vector>
 
 Communicator::Communicator(string serverHostname, short serverBroadcastPort,
-                           short serverListenPort)
+                           short serverListenPort, string username)
     : serverHostname(serverHostname), serverBroadcastPort(serverBroadcastPort),
-      serverListenPort(serverListenPort) {}
+      serverListenPort(serverListenPort), username(username) {}
 
-void Communicator::sendLogin(const char *username) {
-  long messageLen = strlen(username) + 2;
+void Communicator::sendLogin() {
+  long messageLen = username.length() + 2;
   char message[messageLen];
-  sprintf(message, "l;%s", username);
+  sprintf(message, "l;%s", username.c_str());
   sendRaw(message);
 }
 
-void Communicator::sendCommand(const char *username, int keys) {
-  long messageLen = strlen(username) + 10;
+void Communicator::sendCommand(int keys) {
+  long messageLen = username.length() + 10;
   char message[messageLen];
-  sprintf(message, "p;%s;%d", username, keys);
+  sprintf(message, "p;%s;%d", username.c_str(), keys);
   sendRaw(message);
 }
 
