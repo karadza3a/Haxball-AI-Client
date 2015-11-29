@@ -12,20 +12,9 @@
 #include <iostream>
 #include <cstdlib>
 #include <map>
+#include "Constants.hpp"
 
 using std::string;
-
-struct coord {
-  float x, y;
-};
-
-struct player {
-  int id;
-  coord pos;
-  coord vel;
-
-  bool const operator==(const player &that) { return (id == that.id); }
-};
 
 class Communicator;
 
@@ -38,6 +27,7 @@ class GlobalState {
   char *parseScore(char *message);
   char *parseBall(char *message);
   char *parsePlayer(char *message, player *p);
+  void initGoals();
 
 public:
   std::map<int, player> myPlayers;
@@ -45,6 +35,8 @@ public:
   player myPlayer;
   coord ballPos;
   coord ballVel;
+  goal myGoal;
+  goal oppGoal;
 
   GlobalState(Communicator *comm);
   void updateState();

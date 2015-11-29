@@ -285,6 +285,9 @@ UDPSocket::UDPSocket() throw(SocketException)
 
 UDPSocket::UDPSocket(unsigned short localPort) throw(SocketException)
     : CommunicatingSocket(SOCK_DGRAM, IPPROTO_UDP) {
+  int broadcastPermission = 1;
+  setsockopt(sockDesc, SOL_SOCKET, SO_REUSEPORT,
+             (raw_type *)&broadcastPermission, sizeof(broadcastPermission));
   setLocalPort(localPort);
   setBroadcast();
 }

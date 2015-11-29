@@ -35,6 +35,7 @@ GlobalState::GlobalState(Communicator *communicator) : comm(communicator) {
     if (name == comm->username) {
       myId = id;
       myTeam = team;
+      initGoals();
     }
 
     players[team].push_back(new player);
@@ -56,6 +57,13 @@ GlobalState::GlobalState(Communicator *communicator) : comm(communicator) {
   for (player *p : players[1 - myTeam]) {
     oppPlayers[id] = *p;
   }
+}
+
+void GlobalState::initGoals() {
+  myGoal.x = (myTeam == HOME) ? -43 : 43;
+  myGoal.goalWidth = 12.9;
+  oppGoal.x = (myTeam == AWAY) ? -43 : 43;
+  oppGoal.goalWidth = 12.9;
 }
 
 void GlobalState::updateState() {
