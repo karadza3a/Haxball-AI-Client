@@ -18,21 +18,25 @@
 #define PLAYER_RADIUS 1.5
 #define BALL_RADIUS 1.25
 
-struct coord {
-  float x, y;
-};
+#include <CGAL/Simple_cartesian.h>
+typedef CGAL::Simple_cartesian<double> Kernel;
+typedef Kernel::Point_2 Point;
+typedef Kernel::Vector_2 Vector;
+typedef Kernel::Segment_2 Segment;
+typedef Kernel::Line_2 Line;
+typedef Kernel::Ray_2 Ray;
 
 struct player {
   int id;
-  coord pos;
-  coord vel;
+  Point pos;
+  Vector vel;
 
   bool const operator==(const player &that) { return (id == that.id); }
 };
 
 struct goal {
-  float x;
-  float goalWidth;
+  double x;
+  double goalWidth;
 };
 
 #endif /* Constants_h */

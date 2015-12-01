@@ -19,7 +19,12 @@ bool operator<(const player &lhs, const player &rhs) {
  */
 GlobalState::GlobalState(Communicator *communicator) : comm(communicator) {
   char *message = comm->receiveRaw();
-  message = parseScore(message);
+  if (message[0] != 'k') {
+    throw new std::runtime_error("Wrong message received.");
+  }
+  // "k;...."
+  // " ^    "
+  message++;
 
   int offset, team, id, myId = -1;
   char teamString[5], name[50];
@@ -69,6 +74,16 @@ void GlobalState::initGoals() {
 void GlobalState::updateState() {
 
   char *message = comm->receiveRaw();
+
+  if (message[0] == 'g') {
+    // "g;...."
+    message += 2;
+    message = parseScore(message);
+  } else if (message[0] == 'p') {
+    // "p;...."
+    message += 2;
+  }
+
   message = parseBall(message);
 
   int id, offset;
@@ -105,19 +120,23 @@ char *GlobalState::parseScore(char *message) {
 
 char *GlobalState::parseBall(char *message) {
   int offset;
-  int k = sscanf(message, "%f,%f,%f,%f%n", &ballPos.x, &ballPos.y, &ballVel.x,
-                 &ballVel.y, &offset);
+  double x, y, vx, vy;
+  int k = sscanf(message, "%lf,%lf,%lf,%lf%n", &x, &y, &vx, &vy, &offset);
   if (k != 4)
     cerr << "Error parsing: " << message << endl;
+  ballPos = Point(x, y);
+  ballVel = Vector(vx, vy);
   return message + offset;
 }
 
 char *GlobalState::parsePlayer(char *message, player *p) {
   int offset;
-  int k = sscanf(message, "%f,%f,%f,%f%n", &p->pos.x, &p->pos.y, &p->vel.x,
-                 &p->vel.y, &offset);
+  double x, y, vx, vy;
+  int k = sscanf(message, "%lf,%lf,%lf,%lf%n", &x, &y, &vx, &vy, &offset);
   if (k != 4)
     cerr << "Error parsing: " << message << endl;
+  p->pos = Point(x, y);
+  p->vel = Vector(vx, vy);
   return message + offset;
 }
 

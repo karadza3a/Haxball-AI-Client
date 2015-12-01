@@ -33,8 +33,8 @@ public:
   std::map<int, player> myPlayers;
   std::map<int, player> oppPlayers;
   player myPlayer;
-  coord ballPos;
-  coord ballVel;
+  Point ballPos;
+  Vector ballVel;
   goal myGoal;
   goal oppGoal;
 

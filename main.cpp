@@ -25,23 +25,35 @@ int main(int argc, char *argv[]) {
 
   for (int i = 0; i < 1000000; i++) {
     GS.updateState();
-    cout << GS.myPlayer.pos.x << " ";
-    cout << GS.myPlayer.pos.y << " ";
-    cout << GS.ballPos.x << " ";
-    cout << GS.ballPos.y << " ";
+
+    cout << GS.myPlayer.pos.x() << " ";
+    cout << GS.myPlayer.pos.y() << " ";
+    cout << GS.ballPos.x() << " ";
+    cout << GS.ballPos.y() << " ";
     cout << endl;
-    float dx = GS.myPlayer.pos.x - GS.ballPos.x;
-    float dy = GS.myPlayer.pos.y - GS.ballPos.y;
+    double dx = GS.myPlayer.pos.x() - GS.ballPos.x();
+    double dy = GS.myPlayer.pos.y() - GS.ballPos.y();
 
     int key = 0;
-    if (abs(dx) > 3.5) {
+    if (abs(dx) > 2.5) {
       key |= (dx > 0) ? KEY_LEFT : KEY_RIGHT;
     }
-    if (abs(dy) > 3.5) {
+    if (abs(dy) > 2.5) {
       key |= (dy > 0) ? KEY_DOWN : KEY_UP;
     }
-    if (abs(dx) < 4.5 && abs(dy) < 4.5)
+
+    Point post1(GS.oppGoal.x, -GS.oppGoal.goalWidth / 2);
+    Point post2(GS.oppGoal.x, GS.oppGoal.goalWidth / 2);
+
+    Segment goalLine(post1, post2);
+    Ray shootingLine(GS.myPlayer.pos, GS.ballPos);
+
+    auto result = intersection(shootingLine, goalLine);
+
+    if (result)
       key |= KEY_SHOOT;
+
+    cout << endl;
 
     comm->sendCommand(key);
   }
