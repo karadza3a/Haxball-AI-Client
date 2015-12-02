@@ -22,9 +22,8 @@
 
 #include <string>    // For string
 #include <exception> // For exception class
-
+namespace PracticalSocket {
 using namespace std;
-
 /**
  *   Signals a problem with the execution of a socket call.
  */
@@ -337,5 +336,5 @@ public:
 private:
   void setBroadcast();
 };
-
+}
 #endif

@@ -10,13 +10,9 @@
 #define Communicator_hpp
 
 #include "PracticalSocket.h"
-#include <iostream>
-#include <cstdlib>
-#include <set>
+#include "Constants.hpp"
 
 #define BUFFSIZE 10000
-#define HOME 0
-#define AWAY 1
 
 class GlobalState;
 
@@ -32,7 +28,7 @@ class Communicator {
   friend GlobalState;
 
 public:
-  void sendLogin();
+  void sendlogin();
   void sendCommand(int keys);
   Communicator(string serverHostname, short serverBroadcastPort,
                short serverListenPort, string username);

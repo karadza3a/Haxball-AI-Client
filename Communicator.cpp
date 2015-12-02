@@ -7,14 +7,14 @@
 //
 
 #include "Communicator.hpp"
-#include <vector>
 
 Communicator::Communicator(string serverHostname, short serverBroadcastPort,
                            short serverListenPort, string username)
-    : serverHostname(serverHostname), serverBroadcastPort(serverBroadcastPort),
-      serverListenPort(serverListenPort), username(username) {}
+    : serverHostname(serverHostname), username(username),
+      serverBroadcastPort(serverBroadcastPort),
+      serverListenPort(serverListenPort) {}
 
-void Communicator::sendLogin() {
+void Communicator::sendlogin() {
   long messageLen = username.length() + 2;
   char message[messageLen];
   sprintf(message, "l;%s", username.c_str());
@@ -33,10 +33,10 @@ void Communicator::sendRaw(const char *message) {
   long messageLen = strlen(message);
 
   try {
-    UDPSocket sock;
+    PracticalSocket::UDPSocket sock;
     sock.sendTo(message, (int)messageLen, serverHostname, serverListenPort);
-  } catch (SocketException &e) {
-    cerr << e.what() << endl;
+  } catch (PracticalSocket::SocketException &e) {
+    std::cerr << e.what() << std::endl;
     exit(1);
   }
 }
@@ -44,7 +44,7 @@ void Communicator::sendRaw(const char *message) {
 char *Communicator::receiveRaw() {
 
   try {
-    UDPSocket sock(serverBroadcastPort);
+    PracticalSocket::UDPSocket sock(serverBroadcastPort);
 
     string sourceAddress;
     unsigned short sourcePort;
@@ -56,8 +56,8 @@ char *Communicator::receiveRaw() {
 
     //    cout << "Received from " << sourceAddress << ":" << sourcePort;
 
-  } catch (SocketException &e) {
-    cerr << e.what() << endl;
+  } catch (PracticalSocket::SocketException &e) {
+    std::cerr << e.what() << std::endl;
     exit(1);
   }
   return receivedMessage;

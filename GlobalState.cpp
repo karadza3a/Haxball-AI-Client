@@ -7,7 +7,6 @@
 //
 
 #include "GlobalState.hpp"
-#include "Communicator.hpp"
 #include <vector>
 
 bool operator<(const player &lhs, const player &rhs) {
@@ -30,7 +29,7 @@ GlobalState::GlobalState(Communicator *communicator) : comm(communicator) {
   int offset, team, id, myId = -1;
   char teamString[5], name[50];
 
-  vector<player *> players[2];
+  std::vector<player *> players[2];
 
   while (sscanf(message, ";%[^,],%d,%[^;]%n", teamString, &id, name, &offset) ==
          3) {
@@ -49,7 +48,7 @@ GlobalState::GlobalState(Communicator *communicator) : comm(communicator) {
   }
 
   if (myId == -1) {
-    cerr << "Current user does not exist on the server" << endl;
+    std::cerr << "Current user does not exist on the server" << std::endl;
     exit(EXIT_FAILURE);
   }
 
@@ -108,7 +107,7 @@ void GlobalState::updateState() {
         p = &oppPlayers[id];
 
       if (!p) {
-        cerr << "Player not found." << endl;
+        std::cerr << "Player not found." << std::endl;
         return;
       }
 
@@ -124,14 +123,14 @@ char *GlobalState::parseConstants(char *message) {
                  &constMaxY, &constPostY, &constPostRadius, &constBallRadius,
                  &constPlayerRadius, &constKickerRadius, &offset);
   if (k != 7)
-    cerr << "Error parsing: " << message << endl;
+    std::cerr << "Error parsing: " << message << std::endl;
   return message + offset;
 }
 char *GlobalState::parseScore(char *message) {
   int offset;
   int k = sscanf(message, "%d:%d%n", &score[HOME], &score[AWAY], &offset);
   if (k != 2)
-    cerr << "Error parsing: " << message << endl;
+    std::cerr << "Error parsing: " << message << std::endl;
   return message + offset;
 }
 
@@ -140,7 +139,7 @@ char *GlobalState::parseBall(char *message) {
   double x, y, vx, vy;
   int k = sscanf(message, "%lf,%lf,%lf,%lf%n", &x, &y, &vx, &vy, &offset);
   if (k != 4)
-    cerr << "Error parsing: " << message << endl;
+    std::cerr << "Error parsing: " << message << std::endl;
   ballPos = Point(x, y);
   ballVel = Vector(vx, vy);
   return message + offset;
@@ -151,7 +150,7 @@ char *GlobalState::parsePlayer(char *message, player *p) {
   double x, y, vx, vy;
   int k = sscanf(message, "%lf,%lf,%lf,%lf%n", &x, &y, &vx, &vy, &offset);
   if (k != 4)
-    cerr << "Error parsing: " << message << endl;
+    std::cerr << "Error parsing: " << message << std::endl;
   p->pos = Point(x, y);
   p->vel = Vector(vx, vy);
   return message + offset;

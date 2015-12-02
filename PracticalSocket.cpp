@@ -35,6 +35,8 @@ typedef void raw_type; // Type used for raw data on this platform
 
 #include <errno.h> // For errno
 
+namespace PracticalSocket {
+
 using namespace std;
 
 #ifdef WIN32
@@ -381,4 +383,5 @@ void UDPSocket::leaveGroup(const string &multicastGroup) throw(
                  (raw_type *)&multicastRequest, sizeof(multicastRequest)) < 0) {
     throw SocketException("Multicast group leave failed (setsockopt())", true);
   }
+}
 }

@@ -9,10 +9,7 @@
 #ifndef GlobalState_hpp
 #define GlobalState_hpp
 
-#include <iostream>
-#include <cstdlib>
-#include <map>
-#include "Constants.hpp"
+#include "Communicator.hpp"
 
 using std::string;
 
