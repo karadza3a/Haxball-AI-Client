@@ -23,8 +23,9 @@ GlobalState::GlobalState(Communicator *communicator) : comm(communicator) {
     throw new std::runtime_error("Wrong message received.");
   }
   // "k;...."
-  // " ^    "
-  message++;
+  message += 2;
+
+  message = parseConstants(message);
 
   int offset, team, id, myId = -1;
   char teamString[5], name[50];
@@ -65,10 +66,12 @@ GlobalState::GlobalState(Communicator *communicator) : comm(communicator) {
 }
 
 void GlobalState::initGoals() {
-  myGoal.x = (myTeam == HOME) ? -43 : 43;
-  myGoal.goalWidth = 12.9;
-  oppGoal.x = (myTeam == AWAY) ? -43 : 43;
-  oppGoal.goalWidth = 12.9;
+  myGoal.x = (myTeam == HOME) ? -constMaxX : constMaxX;
+  myGoal.yMin = -constPostY;
+  myGoal.yMax = constPostY;
+  oppGoal.x = (myTeam == AWAY) ? -constMaxX : constMaxX;
+  oppGoal.yMin = -constPostY;
+  oppGoal.yMax = constPostY;
 }
 
 void GlobalState::updateState() {
@@ -79,9 +82,13 @@ void GlobalState::updateState() {
     // "g;...."
     message += 2;
     message = parseScore(message);
+    message++;
   } else if (message[0] == 'p') {
     // "p;...."
     message += 2;
+  } else if (message[0] == 'k') {
+    // "user reset"
+    break;
   }
 
   message = parseBall(message);
@@ -110,6 +117,16 @@ void GlobalState::updateState() {
   }
 }
 
+char *GlobalState::parseConstants(char *message) {
+  int offset;
+
+  int k = sscanf(message, "%lf,%lf,%lf,%lf,%lf,%lf,%lf%n", &constMaxX,
+                 &constMaxY, &constPostY, &constPostRadius, &constBallRadius,
+                 &constPlayerRadius, &constKickerRadius, &offset);
+  if (k != 7)
+    cerr << "Error parsing: " << message << endl;
+  return message + offset;
+}
 char *GlobalState::parseScore(char *message) {
   int offset;
   int k = sscanf(message, "%d:%d%n", &score[HOME], &score[AWAY], &offset);

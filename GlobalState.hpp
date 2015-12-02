@@ -24,12 +24,16 @@ class GlobalState {
 
   int score[2];
 
+  char *parseConstants(char *message);
   char *parseScore(char *message);
   char *parseBall(char *message);
   char *parsePlayer(char *message, player *p);
   void initGoals();
 
 public:
+  double constPlayerRadius, constKickerRadius, constBallRadius, constPostRadius,
+      constPostY, constMaxY, constMaxX;
+
   std::map<int, player> myPlayers;
   std::map<int, player> oppPlayers;
   player myPlayer;

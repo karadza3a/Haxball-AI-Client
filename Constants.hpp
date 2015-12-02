@@ -15,9 +15,6 @@
 #define KEY_LEFT 8
 #define KEY_SHOOT 16
 
-#define PLAYER_RADIUS 1.5
-#define BALL_RADIUS 1.25
-
 #include <CGAL/Simple_cartesian.h>
 typedef CGAL::Simple_cartesian<double> Kernel;
 typedef Kernel::Point_2 Point;
@@ -35,8 +32,7 @@ struct player {
 };
 
 struct goal {
-  double x;
-  double goalWidth;
+  double x, yMin, yMax;
 };
 
 #endif /* Constants_h */
