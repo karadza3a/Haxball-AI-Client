@@ -88,7 +88,7 @@ void GlobalState::updateState() {
     message += 2;
   } else if (message[0] == 'k') {
     // "user reset"
-    break;
+    return;
   }
 
   message = parseBall(message);
