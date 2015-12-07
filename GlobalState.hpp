@@ -16,7 +16,6 @@ using std::string;
 class Communicator;
 
 class GlobalState {
-  Communicator *comm;
   int myTeam;
 
   int score[2];
@@ -28,6 +27,7 @@ class GlobalState {
   void initGoals();
 
 public:
+  Communicator *comm;
   double constPlayerRadius, constKickerRadius, constBallRadius, constPostRadius,
       constPostY, constMaxY, constMaxX;
 

@@ -13,6 +13,8 @@ bool operator<(const player &lhs, const player &rhs) {
   return (lhs.id < rhs.id);
 }
 
+extern GlobalState *GS;
+
 /**
  * This will block until player list is received
  */
