@@ -9,21 +9,23 @@
 #include "GlobalState.hpp"
 #include "Communicator.hpp"
 #include "Basic/BasicBehaviour.hpp"
+#include "MachineLearning/ShootingAngleTraining.hpp"
 #include <cmath>
 
 int main(int argc, char *argv[]) {
 
-  srand((unsigned int)time(0));
-  string username = "Bot  ";
-  username[3] = 'A'; //+ rand() % 26;
-  username[4] = '0'; //+ rand() % 10;
+  //  srand((unsigned int)time(0));
+  //  string username = "Bot  ";
+  //  username[3] = 'A'; //+ rand() % 26;
+  //  username[4] = '0'; //+ rand() % 10;
+  //
+  //  Communicator *comm = new Communicator("localhost", 16000, 15000,
+  //  username);
+  //  comm->sendlogin();
+  //  GlobalState GS(comm);
 
-  Communicator *comm = new Communicator("localhost", 16000, 15000, username);
-  comm->sendlogin();
-  GlobalState GS(comm);
-
-  BasicBehaviour BB(&GS);
-  BB.start();
+  ShootingAngleTraining BB;
+  BB.parseDataForMatlab();
 
   return 0;
 }
