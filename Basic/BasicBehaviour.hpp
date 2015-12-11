@@ -16,6 +16,8 @@ class BasicBehaviour {
   GlobalState *GS;
   int move();
   int shoot();
+  Point predictSidelineShotIntersect();
+  Point predictSidelineBounceIntersect(double interX);
 
 public:
   void start();

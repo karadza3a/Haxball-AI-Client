@@ -8,8 +8,6 @@
 
 #include "ShootingAngleTraining.hpp"
 
-double signof(double a) { return (a == 0) ? 0 : (a < 0 ? -1 : 1); }
-
 /*
  * Poorly written, but only needed for prototyping
  */
@@ -62,7 +60,11 @@ void ShootingAngleTraining::parseDataForMatlab() {
 
       Point p1(points[k][2].first, points[k][2].second);
       Point p2(points[k][8].first, points[k][8].second);
-      Ray recordedLine(p1, p2);
+      Ray recordedLine1(p1, p2);
+
+      Point p11(points[k][m - 8].first, points[k][m - 8].second);
+      Point p12(points[k][m - 2].first, points[k][m - 2].second);
+      Ray recordedLine2(p11, p12);
 
       // Shot vector
       Vector shv(*new Point(px, py), *new Point(bx, by));
@@ -72,7 +74,7 @@ void ShootingAngleTraining::parseDataForMatlab() {
       // Extreme shot angles or too low or too high recording resolution
       // (dependant on shot speed) isn't giving precise intersection when
       // recreating it
-      int x = 25;
+      int x = 35;
       if ((a > 45 - x && a < 45 + x) || (-a > 45 - x && -a < 45 + x) ||
           (a > 135 - x && a < 135 + x) || (-a > 135 - x && -a < 135 + x))
         a++;
@@ -88,6 +90,10 @@ void ShootingAngleTraining::parseDataForMatlab() {
       Point p4(4, 20 * signof(shy));
       Line outline(p3, p4);
 
+      Point pg3(43 * signof(shx), 3);
+      Point pg4(43 * signof(shx), 4);
+      Line goalline(pg3, pg4);
+
       Point p5(bx, by);
       Point p6(bx + shx, by + shy);
       Ray idealRay(p5, p6);
@@ -95,8 +101,11 @@ void ShootingAngleTraining::parseDataForMatlab() {
       auto result = intersection(idealRay, outline);
       Point idealInters = boost::get<Point>(result.get());
 
-      result = intersection(recordedLine, outline);
+      result = intersection(recordedLine1, outline);
       Point realInters = boost::get<Point>(result.get());
+
+      result = intersection(recordedLine2, goalline);
+      Point realGoalInters = boost::get<Point>(result.get());
 
       std::cout << idealInters.x() << ", "  //
                 << 20 * signof(shy) << ", " //
@@ -133,7 +142,8 @@ void ShootingAngleTraining::parseDataForMatlab() {
 
                 << atan2(bvy, bvx) << "  ,  ";
 
-      std::cout << realInters.x() << std::endl;
+      std::cout << realInters.x() << "  ,  ";
+      std::cout << realGoalInters.y() << std::endl;
     }
   }
 }

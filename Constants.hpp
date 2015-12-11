@@ -25,6 +25,8 @@
 
 using std::string;
 
+inline double signof(double a) { return (a == 0) ? 0 : (a < 0 ? -1 : 1); }
+
 typedef CGAL::Simple_cartesian<double> Kernel;
 typedef Kernel::Point_2 Point;
 typedef Kernel::Vector_2 Vector;
