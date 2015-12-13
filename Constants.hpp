@@ -15,12 +15,14 @@
 #define KEY_LEFT 8
 #define KEY_SHOOT 16
 
+#define SQRT1_2 0.70710678118
+
 #define HOME 0
 #define AWAY 1
 
 #include <CGAL/Simple_cartesian.h>
-#include <iostream>
 #include <cstdlib>
+#include <iostream>
 #include <map>
 
 using std::string;
@@ -34,6 +36,7 @@ typedef Kernel::Segment_2 Segment;
 typedef Kernel::Line_2 Line;
 typedef Kernel::Ray_2 Ray;
 typedef Kernel::Circle_2 Circle;
+typedef CGAL::Aff_transformation_2<Kernel> Transformation;
 
 struct player {
   int id;

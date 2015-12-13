@@ -10,18 +10,76 @@
 
 BasicBehaviour::BasicBehaviour(GlobalState *GS) : GS(GS) {}
 
-int BasicBehaviour::move() {
-  double dx = GS->myPlayer.pos.x() - GS->ballPos.x();
-  double dy = GS->myPlayer.pos.y() - GS->ballPos.y();
+bool BasicBehaviour::amClosestToBall() {
+  Point p = GS->myPlayer.pos, b = GS->ballPos;
 
-  int key = 0;
-  if (std::abs(dx) > GS->constBallRadius + GS->constBallRadius) {
-    key |= (dx > 0) ? KEY_LEFT : KEY_RIGHT;
+  double mDist = squared_distance(p, b);
+  std::cout << mDist << " ";
+  for (auto &kv : GS->oppPlayers) {
+    double oppDist = squared_distance(kv.second.pos, b);
+    std::cout << oppDist << " ";
+    if (oppDist < mDist) {
+      std::cout << std::endl;
+      return false;
+    }
   }
-  if (std::abs(dy) > GS->constBallRadius + GS->constBallRadius) {
-    key |= (dy > 0) ? KEY_DOWN : KEY_UP;
+  std::cout << std::endl;
+  return true;
+}
+
+int BasicBehaviour::defend() {
+  Point p = GS->myPlayer.pos, b = GS->ballPos;
+  Point goal(GS->myGoal.x, 0);
+
+  if (squared_distance(p, b) < squared_distance(p, goal))
+    return moveToTarget(GS->ballPos);
+
+  Line ballToGoal(GS->ballPos, goal);
+  Point target = ballToGoal.projection(GS->myPlayer.pos);
+
+  return moveToTarget(target);
+}
+
+int BasicBehaviour::moveToTarget(const Point &target) {
+
+  Point p = GS->myPlayer.pos;
+  Vector pv = GS->myPlayer.vel;
+
+  double minVal = 1e9;
+  int choice = 0;
+
+  for (int i = 0; i < 9; i++) {
+    Vector move(move_dx[i] * 10, move_dy[i] * 10);
+
+    Vector result = pv + move;
+
+    Transformation scale(CGAL::SCALING, 0.1);
+    result = scale(result);
+
+    double dDist = squared_distance(p + result, target);
+
+    if (dDist < minVal) {
+      minVal = dDist;
+      choice = i;
+    }
   }
-  return key;
+  return move_key[choice];
+}
+
+int BasicBehaviour::move() {
+
+  Point p = GS->myPlayer.pos, b = GS->ballPos;
+
+  if (amClosestToBall()) {
+    double deltaMin = GS->constBallRadius + GS->constPlayerRadius + 1;
+    if (squared_distance(p, b) > deltaMin * deltaMin) {
+      return moveToTarget(b);
+    }
+
+  } else {
+    return defend();
+  }
+  return 0;
 }
 
 int BasicBehaviour::shoot() {
@@ -57,6 +115,10 @@ int BasicBehaviour::shoot() {
         key |= KEY_SHOOT;
     }
   }
+  if (key) {
+    std::cout << "sh: " << GS->myPlayer.vel.x() << " _:_ "
+              << GS->myPlayer.vel.y() << std::endl;
+  }
   return key;
 }
 
@@ -72,16 +134,37 @@ Point BasicBehaviour::predictSidelineBounceIntersect(double interX) {
   auto result = intersection(idealRay, outline);
   Point idealInters = boost::get<Point>(result.get());
 
-  double params[] = {
-      1, idealInters.x(), 20 * signof(shv.y()), b.y(), b.x(), b.x() * b.x(),
-      b.y() * b.y(), b.y() / b.x(), atan2(b.y(), b.x()), shv.x(), shv.y(),
-      shv.x() * shv.x(), shv.y() * shv.y(),
-      sqrt(shv.x() * shv.x() + shv.y() * shv.y()), shv.y() / shv.x(),
-      atan2(shv.y(), shv.x()), pv.x(), pv.y(), pv.x() * pv.x(), pv.y() * pv.y(),
-      sqrt(pv.x() * pv.x() + pv.y() * pv.y()), pv.y() / pv.x(),
-      atan2(pv.y(), pv.x()), bv.x(), bv.y(), bv.x() * bv.x(), bv.y() * bv.y(),
-      sqrt(bv.x() * bv.x() + bv.y() * bv.y()), bv.y() / bv.x(),
-      atan2(bv.y(), bv.x()), interX};
+  double params[] = {1,
+                     idealInters.x(),
+                     20 * signof(shv.y()),
+                     b.y(),
+                     b.x(),
+                     b.x() * b.x(),
+                     b.y() * b.y(),
+                     b.y() / b.x(),
+                     atan2(b.y(), b.x()),
+                     shv.x(),
+                     shv.y(),
+                     shv.x() * shv.x(),
+                     shv.y() * shv.y(),
+                     sqrt(shv.x() * shv.x() + shv.y() * shv.y()),
+                     shv.y() / shv.x(),
+                     atan2(shv.y(), shv.x()),
+                     pv.x(),
+                     pv.y(),
+                     pv.x() * pv.x(),
+                     pv.y() * pv.y(),
+                     sqrt(pv.x() * pv.x() + pv.y() * pv.y()),
+                     pv.y() / pv.x(),
+                     atan2(pv.y(), pv.x()),
+                     bv.x(),
+                     bv.y(),
+                     bv.x() * bv.x(),
+                     bv.y() * bv.y(),
+                     sqrt(bv.x() * bv.x() + bv.y() * bv.y()),
+                     bv.y() / bv.x(),
+                     atan2(bv.y(), bv.x()),
+                     interX};
   double theta[] = {
       0.5033,  2.4516,    4.0245,   2.6602,  1.4758,  0.02341, 0.31682, -17.595,
       5.3749,  -0.24473,  -2.3588,  -1.8794, 0.25524, 0.77455, -6.7255, -11.028,
@@ -107,16 +190,36 @@ Point BasicBehaviour::predictSidelineShotIntersect() {
   auto result = intersection(idealRay, outline);
   Point idealInters = boost::get<Point>(result.get());
 
-  double params[] = {
-      1, idealInters.x(), 20 * signof(shv.y()), b.y(), b.x(), b.x() * b.x(),
-      b.y() * b.y(), b.y() / b.x(), atan2(b.y(), b.x()), shv.x(), shv.y(),
-      shv.x() * shv.x(), shv.y() * shv.y(),
-      sqrt(shv.x() * shv.x() + shv.y() * shv.y()), shv.y() / shv.x(),
-      atan2(shv.y(), shv.x()), pv.x(), pv.y(), pv.x() * pv.x(), pv.y() * pv.y(),
-      sqrt(pv.x() * pv.x() + pv.y() * pv.y()), pv.y() / pv.x(),
-      atan2(pv.y(), pv.x()), bv.x(), bv.y(), bv.x() * bv.x(), bv.y() * bv.y(),
-      sqrt(bv.x() * bv.x() + bv.y() * bv.y()), bv.y() / bv.x(),
-      atan2(bv.y(), bv.x())};
+  double params[] = {1,
+                     idealInters.x(),
+                     20 * signof(shv.y()),
+                     b.y(),
+                     b.x(),
+                     b.x() * b.x(),
+                     b.y() * b.y(),
+                     b.y() / b.x(),
+                     atan2(b.y(), b.x()),
+                     shv.x(),
+                     shv.y(),
+                     shv.x() * shv.x(),
+                     shv.y() * shv.y(),
+                     sqrt(shv.x() * shv.x() + shv.y() * shv.y()),
+                     shv.y() / shv.x(),
+                     atan2(shv.y(), shv.x()),
+                     pv.x(),
+                     pv.y(),
+                     pv.x() * pv.x(),
+                     pv.y() * pv.y(),
+                     sqrt(pv.x() * pv.x() + pv.y() * pv.y()),
+                     pv.y() / pv.x(),
+                     atan2(pv.y(), pv.x()),
+                     bv.x(),
+                     bv.y(),
+                     bv.x() * bv.x(),
+                     bv.y() * bv.y(),
+                     sqrt(bv.x() * bv.x() + bv.y() * bv.y()),
+                     bv.y() / bv.x(),
+                     atan2(bv.y(), bv.x())};
   double theta[] = {0.7969,  0.5076,  -1.8329,  -1.2616, 0.6156,   0.0154,
                     -0.0909, 0.5626,  1.3680,   -6.6277, -3.3512,  3.9349,
                     -1.1596, 1.8932,  9.5040,   -4.3404, 0.7068,   0.7535,

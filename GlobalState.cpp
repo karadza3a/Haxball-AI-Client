@@ -103,12 +103,11 @@ void GlobalState::updateState() {
       message = parsePlayer(message, &myPlayer);
     else {
       player *p;
-
-      p = &myPlayers[id];
-      if (!p)
+      if (myPlayers.count(id))
+        p = &myPlayers[id];
+      else if (oppPlayers.count(id))
         p = &oppPlayers[id];
-
-      if (!p) {
+      else {
         std::cerr << "Player not found." << std::endl;
         return;
       }

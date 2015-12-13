@@ -16,8 +16,26 @@ class BasicBehaviour {
   GlobalState *GS;
   int move();
   int shoot();
+  int defend();
+  int moveToTarget(const Point &target);
+
   Point predictSidelineShotIntersect();
   Point predictSidelineBounceIntersect(double interX);
+  bool amClosestToBall();
+
+  const double move_dx[9] = {0, 0,        SQRT1_2, 1,       SQRT1_2,
+                             0, -SQRT1_2, -1,      -SQRT1_2};
+  const double move_dy[9] = {0,  1,        SQRT1_2, 0,      -SQRT1_2,
+                             -1, -SQRT1_2, 0,       SQRT1_2};
+  const double move_key[9] = {0,
+                              KEY_UP,
+                              KEY_UP | KEY_RIGHT,
+                              KEY_RIGHT,
+                              KEY_DOWN | KEY_RIGHT,
+                              KEY_DOWN,
+                              KEY_DOWN | KEY_LEFT,
+                              KEY_LEFT,
+                              KEY_UP | KEY_LEFT};
 
 public:
   void start();
