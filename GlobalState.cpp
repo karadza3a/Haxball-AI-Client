@@ -56,13 +56,13 @@ GlobalState::GlobalState(Communicator *communicator) : comm(communicator) {
 
   for (player *p : players[myTeam]) {
     if (myId != p->id)
-      myPlayers[id] = *p;
+      myPlayers[p->id] = *p;
     else
       myPlayer = *p;
   }
 
   for (player *p : players[1 - myTeam]) {
-    oppPlayers[id] = *p;
+    oppPlayers[p->id] = *p;
   }
 }
 

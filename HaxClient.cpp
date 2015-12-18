@@ -6,9 +6,9 @@
 //  Copyright © 2015 Andrej Karadzic. All rights reserved.
 //
 
-#include "GlobalState.hpp"
-#include "Communicator.hpp"
 #include "Basic/BasicBehaviour.hpp"
+#include "Communicator.hpp"
+#include "GlobalState.hpp"
 #include "MachineLearning/ShootingAngleTraining.hpp"
 #include <cmath>
 

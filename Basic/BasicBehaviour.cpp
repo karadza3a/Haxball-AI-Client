@@ -14,16 +14,12 @@ bool BasicBehaviour::amClosestToBall() {
   Point p = GS->myPlayer.pos, b = GS->ballPos;
 
   double mDist = squared_distance(p, b);
-  std::cout << mDist << " ";
   for (auto &kv : GS->oppPlayers) {
     double oppDist = squared_distance(kv.second.pos, b);
-    std::cout << oppDist << " ";
     if (oppDist < mDist) {
-      std::cout << std::endl;
       return false;
     }
   }
-  std::cout << std::endl;
   return true;
 }
 
@@ -36,6 +32,10 @@ int BasicBehaviour::defend() {
 
   Line ballToGoal(GS->ballPos, goal);
   Point target = ballToGoal.projection(GS->myPlayer.pos);
+
+  // If protecting the goal, start pressing
+  if (squared_distance(p, target) < 1)
+    return moveToTarget(b);
 
   return moveToTarget(target);
 }
@@ -76,6 +76,37 @@ int BasicBehaviour::move() {
       return moveToTarget(b);
     }
 
+    Transformation scale(CGAL::SCALING, .2);
+    Point b2 = b + scale(GS->ballVel);
+
+    Point oppGoal(GS->oppGoal.x, 0);
+    Vector goalToBall(oppGoal, b2);
+
+    double d = (GS->constBallRadius + GS->constPlayerRadius - .5) /
+               sqrt(goalToBall.squared_length());
+    scale = Transformation(CGAL::SCALING, d);
+
+    Vector behindTheBall = scale(goalToBall);
+    Vector sideOfTheBall1(-behindTheBall.y(), behindTheBall.x());
+    Vector sideOfTheBall2(behindTheBall.y(), -behindTheBall.x());
+
+    Line side1(b2 + behindTheBall, b2 + sideOfTheBall1);
+    Line side2(b2 + behindTheBall, b2 + sideOfTheBall2);
+
+    Circle player(GS->myPlayer.pos,
+                  GS->constPlayerRadius * GS->constPlayerRadius);
+    Point target;
+
+    if (do_intersect(player, side1) || do_intersect(player, side2)) {
+      target = b2 + behindTheBall;
+    } else if (squared_distance(p, b2 + sideOfTheBall1) <
+               squared_distance(p, b2 + sideOfTheBall2)) {
+      target = b2 + sideOfTheBall1;
+    } else {
+      target = b2 + sideOfTheBall2;
+    }
+
+    return moveToTarget(target);
   } else {
     return defend();
   }
