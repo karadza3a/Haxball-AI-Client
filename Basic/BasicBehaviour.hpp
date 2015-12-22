@@ -19,7 +19,7 @@ class BasicBehaviour {
   int defend();
   int moveToTarget(const Point &target);
 
-  Point predictSidelineShotIntersect();
+  Vector predictShotAngle();
   Point predictSidelineBounceIntersect(double interX);
   bool amClosestToBall();
 

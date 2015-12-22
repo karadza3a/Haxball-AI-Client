@@ -14,7 +14,8 @@
 void ShootingAngleTraining::parseDataForMatlab() {
   const int maxLines = 1000;
   std::vector<std::pair<double, double> //
-              > points[maxLines];
+              >
+      points[maxLines];
   std::vector<double> params[maxLines];
 
   char s[10000];
@@ -58,92 +59,62 @@ void ShootingAngleTraining::parseDataForMatlab() {
       double bvy = params[k][7];
       double shx = bx - px, shy = by - py;
 
-      Point p1(points[k][2].first, points[k][2].second);
-      Point p2(points[k][8].first, points[k][8].second);
-      Ray recordedLine1(p1, p2);
+      Point p1(points[k][0].first, points[k][0].second);
+      Point p2(points[k][10].first, points[k][10].second);
+      Vector recordedLine1(p1, p2);
 
-      Point p11(points[k][m - 8].first, points[k][m - 8].second);
-      Point p12(points[k][m - 2].first, points[k][m - 2].second);
-      Ray recordedLine2(p11, p12);
+      //      Point p11(points[k][m - 8].first, points[k][m - 8].second);
+      //      Point p12(points[k][m - 2].first, points[k][m - 2].second);
+      //      Ray recordedLine2(p11, p12);
 
       // Shot vector
       Vector shv(*new Point(px, py), *new Point(bx, by));
 
-      double a = atan2(shv.y(), shv.x()) * 180 / M_PI;
+      //      double a = atan2(shv.y(), shv.x()) * 180 / M_PI;
 
       // Extreme shot angles or too low or too high recording resolution
       // (dependant on shot speed) isn't giving precise intersection when
       // recreating it
-      int x = 35;
-      if ((a > 45 - x && a < 45 + x) || (-a > 45 - x && -a < 45 + x) ||
-          (a > 135 - x && a < 135 + x) || (-a > 135 - x && -a < 135 + x))
-        a++;
-      else
-        continue;
-
-      double sd = sqrt(squared_distance(p1, p2));
-      if (sd < 2.1 || sd > 2.9)
-        continue;
+      //      int x = 35;
+      //      if ((a > 45 - x && a < 45 + x) || (-a > 45 - x && -a < 45 + x) ||
+      //          (a > 135 - x && a < 135 + x) || (-a > 135 - x && -a < 135 +
+      //          x))
+      //        a++;
+      //      else
+      //        continue;
+      //
+      //      double sd = sqrt(squared_distance(p1, p2));
+      //      if (sd < 2.1 || sd > 2.9)
+      //        continue;
       // end filtering
+      //
+      //      Point p3(3, 20 * signof(shy));
+      //      Point p4(4, 20 * signof(shy));
+      //      Line outline(p3, p4);
+      //
+      //      Point pg3(43 * signof(shx), 3);
+      //      Point pg4(43 * signof(shx), 4);
+      //      Line goalline(pg3, pg4);
 
-      Point p3(3, 20 * signof(shy));
-      Point p4(4, 20 * signof(shy));
-      Line outline(p3, p4);
+      //      Point p5(bx, by);
+      //      Point p6(bx + shx, by + shy);
+      //      Ray idealRay(p5, p6);
+      //
+      //      auto result = intersection(idealRay, outline);
+      //      Point idealInters = boost::get<Point>(result.get());
 
-      Point pg3(43 * signof(shx), 3);
-      Point pg4(43 * signof(shx), 4);
-      Line goalline(pg3, pg4);
+      //      auto result = intersection(recordedLine1, outline);
+      //      Point realInters = boost::get<Point>(result.get());
+      //
+      //      result = intersection(recordedLine2, goalline);
+      //      Point realGoalInters = boost::get<Point>(result.get());
 
-      Point p5(bx, by);
-      Point p6(bx + shx, by + shy);
-      Ray idealRay(p5, p6);
+      std::cout << shx << ", "     //
+                << shy << ", "     //
+                << bvx << ", "     //
+                << bvy << ",    "; //
 
-      auto result = intersection(idealRay, outline);
-      Point idealInters = boost::get<Point>(result.get());
-
-      result = intersection(recordedLine1, outline);
-      Point realInters = boost::get<Point>(result.get());
-
-      result = intersection(recordedLine2, goalline);
-      Point realGoalInters = boost::get<Point>(result.get());
-
-      std::cout << idealInters.x() << ", "  //
-                << 20 * signof(shy) << ", " //
-
-                << by << ", "            //
-                << bx << ", "            //
-                << bx * bx << ", "       //
-                << by * by << ", "       //
-                << by / bx << ", "       //
-                << atan2(by, bx) << ", " //
-
-                << shx << ", "                        //
-                << shy << ", "                        //
-                << shx * shx << ", "                  //
-                << shy * shy << ", "                  //
-                << sqrt(shx * shx + shy * shy) << "," //
-                << shy / shx << ", "                  //
-                << atan2(shy, shx) << ", "            //
-
-                << pvx << ", "                        //
-                << pvy << ", "                        //
-                << pvx * pvx << ","                   //
-                << pvy * pvy << ","                   //
-                << sqrt(pvx * pvx + pvy * pvy) << "," //
-                << pvy / pvx << ", "                  //
-                << atan2(pvy, pvx) << ", "            //
-
-                << bvx << ", "                         //
-                << bvy << ", "                         //
-                << bvx * bvx << ","                    //
-                << bvy * bvy << ","                    //
-                << sqrt(bvx * bvx + bvy * bvy) << ", " //
-                << bvy / bvx << ", "                   //
-
-                << atan2(bvy, bvx) << "  ,  ";
-
-      std::cout << realInters.x() << "  ,  ";
-      std::cout << realGoalInters.y() << std::endl;
+      std::cout << atan2(recordedLine1.y(), recordedLine1.x()) << std::endl;
     }
   }
 }

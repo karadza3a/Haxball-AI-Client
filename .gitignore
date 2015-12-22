@@ -7,3 +7,5 @@ Debug/*
 
 cmake_install.cmake
 CMakeCache.txt
+
+MachineLearning/theta.dat
