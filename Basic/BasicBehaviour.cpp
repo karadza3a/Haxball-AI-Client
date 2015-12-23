@@ -130,21 +130,28 @@ int BasicBehaviour::shoot() {
 
   Segment goalLine(post1, post2);
 
-  Ray shootingRay(GS->ballPos, predictShotAngle());
+  Vector shootingVector = predictShotAngle();
+  Ray shootingRay(GS->ballPos, shootingVector);
 
   auto result = intersection(shootingRay, goalLine);
 
   if (result)
     key |= KEY_SHOOT;
   else {
-    if (signof(GS->ballPos.x() - GS->myPlayer.pos.x()) ==
-        signof(GS->oppGoal.x)) {
+    if (signof(shootingVector.x()) == signof(GS->oppGoal.x)) {
 
-      //      Point intersX = predictSidelineShotIntersect();
-      //      Point bounceY = predictSidelineBounceIntersect(intersX.x());
-      //      if (std::abs(bounceY.y()) < GS->oppGoal.yMax -
-      //      GS->constBallRadius)
-      //        key |= KEY_SHOOT;
+      Point sidep1(3, GS->constMaxY * signof(shootingVector.y()));
+      Point sidep2(4, GS->constMaxY * signof(shootingVector.y()));
+      Line sideline(sidep1, sidep2);
+
+      auto wallResult = intersection(shootingRay, sideline);
+      Point wallInters = boost::get<Point>(wallResult.get());
+
+      Vector bounceVector = predictBounceAngle(shootingVector);
+      Ray bounceRay(wallInters, bounceVector);
+      result = intersection(bounceRay, goalLine);
+      if (result)
+        key |= KEY_SHOOT;
     }
   }
   if (key) {
@@ -154,62 +161,6 @@ int BasicBehaviour::shoot() {
   return key;
 }
 
-Point BasicBehaviour::predictSidelineBounceIntersect(double interX) {
-  Point p = GS->myPlayer.pos, b = GS->ballPos;
-  Vector pv = GS->myPlayer.vel, bv = GS->ballVel, shv(p, b);
-
-  Point sidep1(3, GS->constMaxY * signof(shv.y()));
-  Point sidep2(4, GS->constMaxY * signof(shv.y()));
-  Line outline(sidep1, sidep2);
-
-  Ray idealRay(b, *new Point(b.x() + shv.x(), b.y() + shv.y()));
-  auto result = intersection(idealRay, outline);
-  Point idealInters = boost::get<Point>(result.get());
-
-  double params[] = {1,
-                     idealInters.x(),
-                     20 * signof(shv.y()),
-                     b.y(),
-                     b.x(),
-                     b.x() * b.x(),
-                     b.y() * b.y(),
-                     b.y() / b.x(),
-                     atan2(b.y(), b.x()),
-                     shv.x(),
-                     shv.y(),
-                     shv.x() * shv.x(),
-                     shv.y() * shv.y(),
-                     sqrt(shv.x() * shv.x() + shv.y() * shv.y()),
-                     shv.y() / shv.x(),
-                     atan2(shv.y(), shv.x()),
-                     pv.x(),
-                     pv.y(),
-                     pv.x() * pv.x(),
-                     pv.y() * pv.y(),
-                     sqrt(pv.x() * pv.x() + pv.y() * pv.y()),
-                     pv.y() / pv.x(),
-                     atan2(pv.y(), pv.x()),
-                     bv.x(),
-                     bv.y(),
-                     bv.x() * bv.x(),
-                     bv.y() * bv.y(),
-                     sqrt(bv.x() * bv.x() + bv.y() * bv.y()),
-                     bv.y() / bv.x(),
-                     atan2(bv.y(), bv.x()),
-                     interX};
-  double theta[] = {
-      0.5033,  2.4516,    4.0245,   2.6602,  1.4758,  0.02341, 0.31682, -17.595,
-      5.3749,  -0.24473,  -2.3588,  -1.8794, 0.25524, 0.77455, -6.7255, -11.028,
-      1.5136,  4.0408,    0.54652,  0.77314, -18.704, 0.06929, -11.394, 1.3659,
-      -2.9084, -0.026569, -0.18733, 7.9073,  12.284,  -14.106, -3.6843};
-  int n = sizeof(params) / sizeof(params[0]);
-  double y = 0;
-  for (int i = 0; i < n; i++) {
-    y += params[i] * theta[i];
-  }
-  Point inters(0, y);
-  return inters;
-}
 Vector BasicBehaviour::predictShotAngle() {
   Point p = GS->myPlayer.pos, b = GS->ballPos;
   Vector bv = GS->ballVel, shv(p, b);
@@ -222,6 +173,15 @@ Vector BasicBehaviour::predictShotAngle() {
   return shot;
 }
 
+Vector BasicBehaviour::predictBounceAngle(Vector shotAngle) {
+
+  double theta[] = {-0.600195312500000};
+
+  double x = shotAngle.x();
+  double y = shotAngle.y() * theta[0];
+  Vector shot(x, y);
+  return shot;
+}
 //
 
 void BasicBehaviour::start() {

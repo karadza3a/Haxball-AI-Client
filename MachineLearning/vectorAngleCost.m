@@ -1,4 +1,4 @@
-function [J] = costVectors(theta, X, y)
+function [J, h] = vectorAngleCost(theta, X, y)
 
 m = length(y); % number of training examples
 

@@ -53,68 +53,35 @@ void ShootingAngleTraining::parseDataForMatlab() {
       double py = params[k][1];
       double bx = params[k][2];
       double by = params[k][3];
-      double pvx = params[k][4];
-      double pvy = params[k][5];
+      //      double pvx = params[k][4];
+      //      double pvy = params[k][5];
       double bvx = params[k][6];
       double bvy = params[k][7];
       double shx = bx - px, shy = by - py;
 
-      Point p1(points[k][0].first, points[k][0].second);
-      Point p2(points[k][10].first, points[k][10].second);
-      Vector recordedLine1(p1, p2);
+      Point p11(points[k][0].first, points[k][0].second);
+      Point p12(points[k][10].first, points[k][10].second);
+      Vector recordedLine1(p11, p12);
 
-      //      Point p11(points[k][m - 8].first, points[k][m - 8].second);
-      //      Point p12(points[k][m - 2].first, points[k][m - 2].second);
-      //      Ray recordedLine2(p11, p12);
+      Point p21(points[k][m - 11].first, points[k][m - 11].second);
+      Point p22(points[k][m - 3].first, points[k][m - 3].second);
+      Vector recordedLine2(p21, p22);
 
-      // Shot vector
-      Vector shv(*new Point(px, py), *new Point(bx, by));
+      Line line1(p11, p12);
+      Line line2(p21, p22);
 
-      //      double a = atan2(shv.y(), shv.x()) * 180 / M_PI;
+      auto result = intersection(line1, line2);
+      Point inters = boost::get<Point>(result.get());
 
-      // Extreme shot angles or too low or too high recording resolution
-      // (dependant on shot speed) isn't giving precise intersection when
-      // recreating it
-      //      int x = 35;
-      //      if ((a > 45 - x && a < 45 + x) || (-a > 45 - x && -a < 45 + x) ||
-      //          (a > 135 - x && a < 135 + x) || (-a > 135 - x && -a < 135 +
-      //          x))
-      //        a++;
-      //      else
-      //        continue;
-      //
-      //      double sd = sqrt(squared_distance(p1, p2));
-      //      if (sd < 2.1 || sd > 2.9)
-      //        continue;
-      // end filtering
-      //
-      //      Point p3(3, 20 * signof(shy));
-      //      Point p4(4, 20 * signof(shy));
-      //      Line outline(p3, p4);
-      //
-      //      Point pg3(43 * signof(shx), 3);
-      //      Point pg4(43 * signof(shx), 4);
-      //      Line goalline(pg3, pg4);
-
-      //      Point p5(bx, by);
-      //      Point p6(bx + shx, by + shy);
-      //      Ray idealRay(p5, p6);
-      //
-      //      auto result = intersection(idealRay, outline);
-      //      Point idealInters = boost::get<Point>(result.get());
-
-      //      auto result = intersection(recordedLine1, outline);
-      //      Point realInters = boost::get<Point>(result.get());
-      //
-      //      result = intersection(recordedLine2, goalline);
-      //      Point realGoalInters = boost::get<Point>(result.get());
+      std::cerr << inters.y() << std::endl;
 
       std::cout << shx << ", "     //
                 << shy << ", "     //
                 << bvx << ", "     //
                 << bvy << ",    "; //
 
-      std::cout << atan2(recordedLine1.y(), recordedLine1.x()) << std::endl;
+      std::cout << atan2(recordedLine1.y(), recordedLine1.x()) << ",    "
+                << atan2(recordedLine2.y(), recordedLine2.x()) << std::endl;
     }
   }
 }

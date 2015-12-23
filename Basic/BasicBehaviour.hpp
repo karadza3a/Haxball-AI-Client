@@ -20,7 +20,7 @@ class BasicBehaviour {
   int moveToTarget(const Point &target);
 
   Vector predictShotAngle();
-  Point predictSidelineBounceIntersect(double interX);
+  Vector predictBounceAngle(Vector shotAngle);
   bool amClosestToBall();
 
   const double move_dx[9] = {0, 0,        SQRT1_2, 1,       SQRT1_2,
