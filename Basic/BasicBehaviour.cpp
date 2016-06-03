@@ -34,7 +34,7 @@ int BasicBehaviour::defend() {
   Point target = ballToGoal.projection(GS->myPlayer.pos);
 
   // If protecting the goal, start pressing
-  if (squared_distance(p, target) < 1)
+  if (squared_distance(p, target) < 3)
     return moveToTarget(b);
 
   return moveToTarget(target);
@@ -114,6 +114,14 @@ int BasicBehaviour::move() {
 }
 
 int BasicBehaviour::shoot() {
+  int key = 0;
+  key |= shootToClear();
+  key |= shootToScore();
+  return key;
+}
+
+int BasicBehaviour::shootToScore() {
+
   Circle player(GS->myPlayer.pos,
                 GS->constPlayerRadius * GS->constPlayerRadius);
   Circle kicker(GS->myPlayer.pos,
@@ -154,13 +162,43 @@ int BasicBehaviour::shoot() {
         key |= KEY_SHOOT;
     }
   }
-  if (key) {
-    std::cout << "sh: " << GS->ballVel.x() << " _:_ " << GS->ballVel.y()
-              << std::endl;
-  }
   return key;
 }
 
+int BasicBehaviour::shootToClear() {
+
+  Circle player(GS->myPlayer.pos,
+                GS->constPlayerRadius * GS->constPlayerRadius);
+  Circle kicker(GS->myPlayer.pos,
+                GS->constKickerRadius * GS->constKickerRadius);
+  Circle ball(GS->ballPos, GS->constBallRadius * GS->constBallRadius);
+
+  if (std::abs(GS->myGoal.x - player.center().x()) > 15) {
+    return 0;
+  }
+
+  if (!do_intersect(player, ball)) {
+    return 0;
+  }
+
+  int key = 0;
+
+  Vector shootingVector = predictShotAngle();
+  Ray shootingRay(GS->ballPos, shootingVector);
+
+  if (signof(shootingVector.x()) == signof(GS->myGoal.x)) {
+
+    Point post1(GS->myGoal.x, GS->myGoal.yMin - GS->constBallRadius);
+    Point post2(GS->myGoal.x, GS->myGoal.yMax + GS->constBallRadius);
+    Segment goalLine(post1, post2);
+
+    auto result = intersection(shootingRay, goalLine);
+
+    if (!result)
+      key |= KEY_SHOOT;
+  }
+  return key;
+}
 Vector BasicBehaviour::predictShotAngle() {
   Point p = GS->myPlayer.pos, b = GS->ballPos;
   Vector bv = GS->ballVel, shv(p, b);

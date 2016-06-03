@@ -16,6 +16,8 @@ class BasicBehaviour {
   GlobalState *GS;
   int move();
   int shoot();
+  int shootToScore();
+  int shootToClear();
   int defend();
   int moveToTarget(const Point &target);
 
